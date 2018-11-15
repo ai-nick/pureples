@@ -127,20 +127,18 @@ def draw_es_nd(id_to_coords, connections, filename):
         xs.append(coord[0])
         ys.append(coord[1])
         zs.append(coord[2])
-        if(coord[0] > end_x):
-            end_x = coord[0]
-        if(coord[1] > end_y):
-            end_y = coord[1]
-        if(coord[2] > end_z):
-            end_z = coord[2]
+
     #plt.axis([-end_x, end_x, -end_y, end_y, -end_z, end_z])
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.gca(projection='3d')
+    
     for c in connections:
         color = 'red'
         if c.weight > 0.0:
             color = 'black'
         ax.plot(c.coord1, c.coord2, color='g')
+    
     ax.scatter(xs, ys, zs)
+    #ax.plot((xs[0],ys[0],zs[0]), (xs[-1],ys[-1],zs[-1]), color='g')
     '''
     for (coord, idx) in id_to_coords.items():
         plt.plot(coord[0], coord[1], marker='o', markersize=8.0, color='grey')
