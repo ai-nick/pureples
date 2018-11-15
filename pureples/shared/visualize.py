@@ -132,10 +132,13 @@ def draw_es_nd(id_to_coords, connections, filename):
     ax = fig.gca(projection='3d')
     
     for c in connections:
-        color = 'red'
+        xc = (c.coord1[0], c.coord2[0])
+        yc = (c.coord1[1], c.coord2[1])
+        zc = (c.coord1[2], c.coord2[2])
+        color = 'black'
         if c.weight > 0.0:
-            color = 'black'
-        ax.plot(c.coord1, c.coord2, color='g')
+            color = 'green'
+        ax.plot3D(xc, yc, zc, color=color)
     
     ax.scatter(xs, ys, zs)
     #ax.plot((xs[0],ys[0],zs[0]), (xs[-1],ys[-1],zs[-1]), color='g')
