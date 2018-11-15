@@ -2,12 +2,13 @@ import graphviz
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import _pickle as pickle
 import os
 os.environ["PATH"] += os.pathsep + 'D:/Program Files (x86)/Graphviz2.38/bin/'
 
 # Draw neural network with arbitrary topology.
-def draw_net(net, filename=None):
+def draw_net(net, filename=None, is_3d = False):
     node_names = {}
     node_colors = {}
 
@@ -92,6 +93,7 @@ def draw_es(id_to_coords, connections, filename):
     fig = plt.figure()
     end_x = 0
     end_y = 0
+    end_z = 0
     for (coord, idx) in id_to_coords.items():
         if(coord[0] > end_x):
             end_x = coord[0]
@@ -111,6 +113,40 @@ def draw_es(id_to_coords, connections, filename):
         plt.plot(coord[0], coord[1], marker='o', markersize=8.0, color='grey')
 
     plt.grid()
+    fig.savefig(filename)
+    
+def draw_es_nd(id_to_coords, connections, filename):
+    fig = plt.figure()
+    end_x = 0
+    end_y = 0
+    end_z = 0
+    xs = []
+    ys = []
+    zs = []
+    for (coord, idx) in id_to_coords.items():
+        xs.append(coord[0])
+        ys.append(coord[1])
+        zs.append(coord[2])
+        if(coord[0] > end_x):
+            end_x = coord[0]
+        if(coord[1] > end_y):
+            end_y = coord[1]
+        if(coord[2] > end_z):
+            end_z = coord[2]
+    #plt.axis([-end_x, end_x, -end_y, end_y, -end_z, end_z])
+    ax = fig.add_subplot(111, projection='3d')
+    for c in connections:
+        color = 'red'
+        if c.weight > 0.0:
+            color = 'black'
+        ax.plot(c.coord1, c.coord2, color='g')
+    ax.scatter(xs, ys, zs)
+    '''
+    for (coord, idx) in id_to_coords.items():
+        plt.plot(coord[0], coord[1], marker='o', markersize=8.0, color='grey')
+    '''
+    fig.savefig(filename)
+    plt.show()
     fig.savefig(filename)
     
 

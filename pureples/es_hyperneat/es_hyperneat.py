@@ -3,7 +3,7 @@ import copy
 import numpy as np
 import itertools
 from pureples.hyperneat.hyperneat import query_cppn, query_cppn_nd
-from pureples.shared.visualize import draw_es
+from pureples.shared.visualize import draw_es, draw_es_nd
 from math import factorial
 
 class ESNetwork:
@@ -80,7 +80,7 @@ class ESNetwork:
                     
         # Visualize the network?
         if filename is not None:
-            draw_es(coords_to_id, draw_connections, filename)
+            draw_es_nd(coords_to_id, draw_connections, filename)
         return neat.nn.RecurrentNetwork(input_nodes, output_nodes, node_evals)
         
     # Create a RecurrentNetwork using the ES-HyperNEAT approach.
