@@ -135,12 +135,12 @@ def draw_es_nd(id_to_coords, connections, filename):
         xc = (c.coord1[0], c.coord2[0])
         yc = (c.coord1[1], c.coord2[1])
         zc = (c.coord1[2], c.coord2[2])
-        color = 'black'
+        color = 'r'
         if c.weight > 0.0:
-            color = 'green'
-        ax.plot3D(xc, yc, zc, color=color)
+            color = 'g'
+        ax.plot3D(xc, yc, zc, color='g')
     
-    ax.scatter(xs, ys, zs)
+    ax.scatter3D(xs, ys, zs)
     #ax.plot((xs[0],ys[0],zs[0]), (xs[-1],ys[-1],zs[-1]), color='g')
     '''
     for (coord, idx) in id_to_coords.items():
