@@ -214,8 +214,8 @@ class ESNetwork:
                 for i in range(len(c.coord)):
                     query_coord = []
                     query_coord2 = []
-                    dimen = c.coord[i] - c.width
-                    dimen2 = c.coord[i] + c.width
+                    dimen = c.coord[i] - p.width
+                    dimen2 = c.coord[i] + p.width
                     for x in range(len(coord)):
                         if x != i:
                             query_coord.append(c.coord[x])
