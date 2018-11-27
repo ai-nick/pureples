@@ -1,6 +1,6 @@
 import neat 
-
-
+import numpy as np 
+from math import signum
 # Creates a recurrent network using a cppn and a substrate.
 def create_phenotype_network(cppn, substrate, activation_function="sigmoid"):
     input_coordinates = substrate.input_coordinates
@@ -103,6 +103,25 @@ def query_cppn_nd(coord1, coord2, outgoing, cppn, max_weight=5.0):
         i.append(1.0)
     w = cppn.activate(i)[0]
     if abs(w) > .2:
-        return w*max_weight
+        return (abs(w) - .2)*max_weight/(.8)*.signum(w)
     else:
         return 0.0
+
+
+def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weiight=5.0):
+    result = 0.0
+    i = []
+    if outgoing:
+        for ix in range(len(coord1)):
+            i2 = []
+            i2.append(coord1[ix])
+            i2.append(coord2[ix])
+        i.append(i2)
+    else:
+        for ix in range(len(coord1)):
+            i2 = []
+            i2.append(coord2[ix])
+            i2.append(coord1[ix])
+        i.append(i2)
+    w = cppn.activate(i, np.shape(i))
+    return w

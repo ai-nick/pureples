@@ -2,7 +2,7 @@ import neat
 import copy
 import numpy as np
 import itertools
-from pureples.hyperneat.hyperneat import query_cppn, query_cppn_nd
+from pureples.hyperneat.hyperneat import query_cppn, query_cppn_nd, query_torch_cppn
 from pureples.shared.visualize import draw_es, draw_es_nd
 from math import factorial
 
