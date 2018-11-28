@@ -1,5 +1,5 @@
-import neat 
-import numpy as np 
+import neat
+import numpy as np
 
 # Creates a recurrent network using a cppn and a substrate.
 def create_phenotype_network(cppn, substrate, activation_function="sigmoid"):
@@ -95,7 +95,9 @@ def query_cppn_nd(coord1, coord2, outgoing, cppn, max_weight=5.0):
         new_list = []
         new_list.append(coord1[x])
         new_list.append(coord2[x])
+        new_list = np.array(new_list)
         master.append(new_list)
+    master = np.array(master)
     w = cppn(n_inputs=master)
     return w
 
@@ -103,12 +105,12 @@ def query_cppn_nd(coord1, coord2, outgoing, cppn, max_weight=5.0):
 def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weiight=5.0):
     result = 0.0
     num_dimen = len(coord1)
-    master = []
-    for x in range(num_dimen):
-        new_list = []
+    master = {}
+    for x in range(num_dimen*2):
         new_list.append(coord1[x])
         new_list.append(coord2[x])
-        master.append(np.array(new_list))
-
-    w = cppn(n_inputs=np.array(master))
+        new_list = np.array(new_list)
+        master.append(new_list)
+    master = np.array(master)
+    w = cppn(n_inputs=master)
     return w
