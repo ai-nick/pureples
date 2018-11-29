@@ -108,7 +108,9 @@ def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weiight=5.0):
         new_list = []
         new_list.append(coord1[x])
         new_list.append(coord2[x])
-        master.append(np.array(new_list))
-
-    w = cppn(n_inputs=np.array(master))
+        new_list = np.array(np.array(new_list))
+        master.append(new_list)
+    #master = np.array(master)
+    print(master[0])
+    w = cppn(n_inputs=master)
     return w
