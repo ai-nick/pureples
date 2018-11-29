@@ -88,29 +88,40 @@ def query_cppn(coord1, coord2, outgoing, cppn, max_weight=5.0):
         return 0.0
 
 def query_cppn_nd(coord1, coord2, outgoing, cppn, max_weight=5.0):
-    result = 0.0
-    num_dimen = len(coord1)
-    master = []
-    for x in range(num_dimen):
-        new_list = []
-        new_list.append(coord1[x])
-        new_list.append(coord2[x])
-        new_list = np.array(new_list)
-        master.append(new_list)
-    master = np.array(master)
-    w = cppn(n_inputs=master)
-    return w
+    i = []
+    if outgoing:
+        for ix in range(len(coord1)):
+            i.append(coord1[ix])
+        for ix2 in range(len(coord2)):
+            i.append(coord2[ix2])
+        i.append(1.0)
+    else:
+        for ix2 in range(len(coord2)):
+            i.append(coord2[ix2])
+        for ix in range(len(coord1)):
+            i.append(coord1[ix])
+        i.append(1.0)
+    w = cppn.activate(i)[0]
+    if abs(w) > .2:
+        return (abs(w) - .2)*max_weight/(.8)*np.sign(w)
+    else:
+        return 0.0
 
-
-def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weiight=5.0):
+def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weight=5.0):
     result = 0.0
     num_dimen = len(coord1)
     master = {}
-    for x in range(num_dimen*2):
-        new_list.append(coord1[x])
-        new_list.append(coord2[x])
-        new_list = np.array(new_list)
-        master.append(new_list)
-    master = np.array(master)
-    w = cppn(n_inputs=master)
-    return w
+    for x in range(num_dimen):
+        if(outgoing):
+            master["leaf_one_"+str(x)] = np.array(coord1[x])
+            master["leaf_two_"+str(x)] = np.array(coord2[x])
+        else:
+            master["leaf_one_"+str(x)] = np.array(coord2[x])
+            master["leaf_two_"+str(x)] = np.array(coord1[x])
+    #master = np.array(master)
+    w = float(cppn(master)[0])
+    
+    if abs(w) > 0.2:  # If abs(weight) is below threshold, treat weight as 0.0.
+        return (abs(w) - .2)*max_weight/(.8)*np.sign(w)
+    else:
+        return 0.0

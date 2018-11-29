@@ -155,38 +155,37 @@ class ESNetwork:
         return np.var(self.get_weights(p))
 
 
-    def division_initialization_nd(self, coord, outgoing):
+    def division_initialization_nd(self, coord, root, outgoing):
         dimen = len(coord)
         root_coord = []
         #we will loop twice the length of the substrate coord
         #we set the root of our tree to  zero index coord in the dimension of the input coord
         #we need a n-tree with n being 2^coordlength so that we can split each dimension in a cartesian manner
-        for s in range(dimen):
-            root_coord.append(0.0)
+        #for s in range(dimen):
+            #root_coord.append(0.0)
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
-        root = nDimensionTree(root_coord, 1.0, 1)
+        #root = nDimensionTree(root_coord, 1.0, 1)
         q = [root]
-        new_roots = []
         while q:
-            p = q.pop(0)
+            p = q[-1]
             # here we will subdivide to 2^coordlength as described above
             # this allows us to search from +- midpoints on each axis of the input coord
             p.divide_childrens()
             for c in p.cs:
-                c.w = query_cppn_nd(coord, c.coord, outgoing, self.cppn, self.max_weight)
+                c.w = query_cppn_nd(coord, p.coord, outgoing, self.cppn, self.max_weight)
             
             if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p) > self.division_threshold):
-                new_roots.append(p)
                 for child in p.cs:
                     q.append(child)
 
-        return new_roots
+        return root
 
 
     # Initialize the quadtree by dividing it in appropriate quads.
     def division_initialization(self, coord, outgoing):
         root = QuadPoint(0.0, 0.0, 1.0, 1.0)
         q = [root]
+
         while q:
             p = q.pop(0)
             
@@ -273,37 +272,40 @@ class ESNetwork:
         connections1, connections2, connections3 = set(), set(), set()
         
         for i in inputs:
-            roots = self.division_initialization_nd(i, True)
-            while(roots):
-                root = roots.pop(0)
-                self.prune_all_the_dimensions(i, root, True)
-                connections1 = connections1.union(self.connections)
-                for c in connections1:
-                    hidden_nodes.add(tuple(c.coord2))
-                self.connections = set()
+            root_coord = []
+            for s in range(len(inputs[0])):
+                root_coord.append(0.0)
+            new_tree = nDimensionTree(root_coord, 1.0, 1)
+            root = self.division_initialization_nd(i, new_tree, True)
+            self.prune_all_the_dimensions(i, root, True)
+            connections1 = connections1.union(self.connections)
+            for c in connections1:
+                hidden_nodes.add(tuple(c.coord2))
+            self.connections = set()
 
         unexplored_hidden_nodes = copy.deepcopy(hidden_nodes)
 
         for i in range(self.iteration_level):
             for index_coord in unexplored_hidden_nodes:
-                roots = self.division_initialization_nd(index_coord, True)
-                while(roots):
-                    root = roots.pop(0)
-                    self.prune_all_the_dimensions(index_coord, root, True)
-                    connections2 = connections2.union(self.connections)
-                    for c in connections2:
-                        hidden_nodes.add(tuple(c.coord2))
-                    self.connections = set()
+                new_tree = nDimensionTree(index_coord, 1.0/(2*(2+i)), 2+(i))
+                root = self.division_initialization_nd(index_coord, new_tree, True)
+                self.prune_all_the_dimensions(index_coord, root, True)
+                connections2 = connections2.union(self.connections)
+                for c in connections2:
+                    hidden_nodes.add(tuple(c.coord2))
+                self.connections = set()
         
         unexplored_hidden_nodes -= hidden_nodes
         
         for c_index in range(len(outputs)):
-            roots = self.division_initialization_nd(outputs[c_index], False)
-            while(roots):
-                root = roots.pop(0)
-                self.prune_all_the_dimensions(outputs[c_index], root, False)
-                connections3 = connections3.union(self.connections)
-                self.connections = set()
+            root_coord = []
+            for s in range(len(inputs[0])):
+                root_coord.append(0.0)
+            new_tree = nDimensionTree(root_coord, 1.0, 1)
+            root = self.division_initialization_nd(outputs[c_index], new_tree, False)
+            self.prune_all_the_dimensions(outputs[c_index], root, False)
+            connections3 = connections3.union(self.connections)
+            self.connections = set()
         connections = connections1.union(connections2.union(connections3))
         return self.clean_n_dimensional(connections)
             
