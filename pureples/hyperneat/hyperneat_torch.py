@@ -74,40 +74,7 @@ def find_neurons(cppn, coord, nodes, start_idx, outgoing, max_weight=5.0):
     return im
 
 
-# Get the weight from one point to another using the CPPN - takes into consideration which point is source/target.
-def query_cppn(coord1, coord2, outgoing, cppn, max_weight=5.0):
-
-    if outgoing:
-        i = [coord1[0], coord1[1], coord2[0], coord2[1], 1.0]
-    else:
-        i = [coord2[0], coord2[1], coord1[0], coord1[1], 1.0]
-    w = cppn.activate(i)[0]
-    if abs(w) > 0.2:  # If abs(weight) is below threshold, treat weight as 0.0.
-        return (abs(w) - .2)*max_weight/(.8)*np.sign(w)
-    else:
-        return 0.0
-
 def query_cppn_nd(coord1, coord2, outgoing, cppn, max_weight=5.0):
-    i = []
-    if outgoing:
-        for ix in range(len(coord1)):
-            i.append(coord1[ix])
-        for ix2 in range(len(coord2)):
-            i.append(coord2[ix2])
-        i.append(1.0)
-    else:
-        for ix2 in range(len(coord2)):
-            i.append(coord2[ix2])
-        for ix in range(len(coord1)):
-            i.append(coord1[ix])
-        i.append(1.0)
-    w = cppn.activate(i)[0]
-    if abs(w) > .2:
-        return (abs(w) - .2)*max_weight/(.8)*np.sign(w)
-    else:
-        return 0.0
-
-def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weight=5.0):
     result = 0.0
     num_dimen = len(coord1)
     master = {}
