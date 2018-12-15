@@ -166,21 +166,19 @@ class ESNetwork:
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
         root = nDimensionTree(root_coord, 1.0, 1)
         q = [root]
-        new_roots = []
         while q:
             p = q.pop(0)
             # here we will subdivide to 2^coordlength as described above
             # this allows us to search from +- midpoints on each axis of the input coord
             p.divide_childrens()
             for c in p.cs:
-                c.w = query_cppn_nd(coord, c.coord, outgoing, self.cppn, self.max_weight)
+                c.w = query_cppn_nd(coord, p.coord, outgoing, self.cppn, self.max_weight)
             
             if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p) > self.division_threshold):
-                new_roots.append(p)
                 for child in p.cs:
                     q.append(child)
 
-        return new_roots
+        return root
 
 
     # Initialize the quadtree by dividing it in appropriate quads.
