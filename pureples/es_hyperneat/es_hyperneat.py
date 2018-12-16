@@ -271,37 +271,31 @@ class ESNetwork:
         connections1, connections2, connections3 = set(), set(), set()
         
         for i in inputs:
-            roots = self.division_initialization_nd(i, True)
-            while(roots):
-                root = roots.pop(0)
-                self.prune_all_the_dimensions(i, root, True)
-                connections1 = connections1.union(self.connections)
-                for c in connections1:
-                    hidden_nodes.add(tuple(c.coord2))
-                self.connections = set()
+            root = self.division_initialization_nd(i, True)
+            self.prune_all_the_dimensions(i, root, True)
+            connections1 = connections1.union(self.connections)
+            for c in connections1:
+                hidden_nodes.add(tuple(c.coord2))
+            self.connections = set()
 
         unexplored_hidden_nodes = copy.deepcopy(hidden_nodes)
 
         for i in range(self.iteration_level):
             for index_coord in unexplored_hidden_nodes:
-                roots = self.division_initialization_nd(index_coord, True)
-                while(roots):
-                    root = roots.pop(0)
-                    self.prune_all_the_dimensions(index_coord, root, True)
-                    connections2 = connections2.union(self.connections)
-                    for c in connections2:
-                        hidden_nodes.add(tuple(c.coord2))
-                    self.connections = set()
+                root = self.division_initialization_nd(index_coord, True)
+                self.prune_all_the_dimensions(index_coord, root, True)
+                connections2 = connections2.union(self.connections)
+                for c in connections2:
+                    hidden_nodes.add(tuple(c.coord2))
+                self.connections = set()
         
         unexplored_hidden_nodes -= hidden_nodes
         
         for c_index in range(len(outputs)):
-            roots = self.division_initialization_nd(outputs[c_index], False)
-            while(roots):
-                root = roots.pop(0)
-                self.prune_all_the_dimensions(outputs[c_index], root, False)
-                connections3 = connections3.union(self.connections)
-                self.connections = set()
+            root = self.division_initialization_nd(outputs[c_index], False)
+            self.prune_all_the_dimensions(outputs[c_index], root, False)
+            connections3 = connections3.union(self.connections)
+            self.connections = set()
         connections = connections1.union(connections2.union(connections3))
         return self.clean_n_dimensional(connections)
             
