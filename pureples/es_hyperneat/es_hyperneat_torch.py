@@ -224,12 +224,8 @@ class ESNetwork:
                         else:
                             query_coord.append(dimen2)
                             query_coord2.append(dimen)
-                    if outgoing:
-                        child_array.append(abs(c.w - query_torch_cppn(coord, query_coord, outgoing, self.cppn, self.max_weight)))
-                        child_array.append(abs(c.w - query_torch_cppn(coord, query_coord2, outgoing, self.cppn, self.max_weight)))
-                    else:
-                        child_array.append(abs(c.w - query_torch_cppn(query_coord, coord, outgoing, self.cppn, self.max_weight)))
-                        child_array.append(abs(c.w - query_torch_cppn(query_coord2, coord, outgoing, self.cppn, self.max_weight)))
+                    child_array.append(abs(c.w - query_torch_cppn(coord, query_coord, outgoing, self.cppn, self.max_weight)))
+                    child_array.append(abs(c.w - query_torch_cppn(coord, query_coord2, outgoing, self.cppn, self.max_weight)))
                 con = None
                 max_val = 0.0
                 cntrl = len(child_array)-1
