@@ -130,7 +130,7 @@ class ESNetwork:
         # Visualize the network?
         if filename is not None:
             draw_es(coords_to_id, draw_connections, filename)
-        return neat.nn.RecurrentNetwork(input_nodes, output_nodes, node_evals)  # This is actually a feedforward network.
+        return neat.ctrnn.ctrnn(input_nodes, output_nodes, node_evals)  # This is actually a feedforward network.
 
     # Recursively collect all weights for a given QuadPoint.
     @staticmethod
