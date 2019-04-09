@@ -65,7 +65,11 @@ def find_neurons(cppn, coord, nodes, start_idx, outgoing, max_weight=5.0):
     idx = start_idx
 
     for node in nodes:
+<<<<<<< HEAD
         w = query_torch_cppn(coord, node, outgoing, cppn, max_weight)
+=======
+        w = query_cppn_nd(coord, node, outgoing, cppn, max_weight)
+>>>>>>> 16793be... lets try this
 
         if w is not 0.0:  # Only include connection if the weight isn't 0.0.
             im.append((idx, w))
@@ -89,6 +93,10 @@ def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weight=5.0):
     w = float(cppn(master)[0])
     
     if abs(w) > 0.2:  # If abs(weight) is below threshold, treat weight as 0.0.
+<<<<<<< HEAD
         return abs(w)
+=======
+        return w*max_weight
+>>>>>>> 16793be... lets try this
     else:
         return 0.0
