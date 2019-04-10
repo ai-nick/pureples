@@ -122,6 +122,6 @@ def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weight=5.0):
     w = float(cppn(master)[0])
     
     if abs(w) > 0.2:  # If abs(weight) is below threshold, treat weight as 0.0.
-        return w * max_weight
+        return (abs(w) - .2)*max_weight/(.8)*np.sign(w)
     else:
         return 0.0
