@@ -81,6 +81,7 @@ class ESNetwork:
         # Visualize the network?
         if filename is not None:
             draw_es_nd(coords_to_id, draw_connections, filename)
+        print(len(node_evals))
         return neat.nn.RecurrentNetwork(input_nodes, output_nodes, node_evals)
         
     # Create a RecurrentNetwork using the ES-HyperNEAT approach.
@@ -166,7 +167,6 @@ class ESNetwork:
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
         root = nDimensionTree(root_coord, 1.0, 1)
         q = [root]
-        new_roots = []
         while q:
             p = q.pop(0)
             # here we will subdivide to 2^coordlength as described above
@@ -175,12 +175,16 @@ class ESNetwork:
             for c in p.cs:
                 c.w = query_torch_cppn(coord, c.coord, outgoing, self.cppn, self.max_weight)
             
+<<<<<<< HEAD
             if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and abs(self.variance(p)) > self.division_threshold):
                 new_roots.append(p)
+=======
+            if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p) > self.division_threshold):
+>>>>>>> d3427d8c601e20783612620e104f22ced4204a21
                 for child in p.cs:
                     q.append(child)
 
-        return new_roots
+        return root
 
 
     # Initialize the quadtree by dividing it in appropriate quads.
@@ -273,37 +277,31 @@ class ESNetwork:
         connections1, connections2, connections3 = set(), set(), set()
         
         for i in inputs:
-            roots = self.division_initialization_nd(i, True)
-            while(roots):
-                root = roots.pop(0)
-                self.prune_all_the_dimensions(i, root, True)
-                connections1 = connections1.union(self.connections)
-                for c in connections1:
-                    hidden_nodes.add(tuple(c.coord2))
-                self.connections = set()
+            root = self.division_initialization_nd(i, True)
+            self.prune_all_the_dimensions(i, root, True)
+            connections1 = connections1.union(self.connections)
+            for c in connections1:
+                hidden_nodes.add(tuple(c.coord2))
+            self.connections = set()
 
         unexplored_hidden_nodes = copy.deepcopy(hidden_nodes)
 
         for i in range(self.iteration_level):
             for index_coord in unexplored_hidden_nodes:
-                roots = self.division_initialization_nd(index_coord, True)
-                while(roots):
-                    root = roots.pop(0)
-                    self.prune_all_the_dimensions(index_coord, root, True)
-                    connections2 = connections2.union(self.connections)
-                    for c in connections2:
-                        hidden_nodes.add(tuple(c.coord2))
-                    self.connections = set()
+                root = self.division_initialization_nd(index_coord, True)
+                self.prune_all_the_dimensions(index_coord, root, True)
+                connections2 = connections2.union(self.connections)
+                for c in connections2:
+                    hidden_nodes.add(tuple(c.coord2))
+                self.connections = set()
         
         unexplored_hidden_nodes -= hidden_nodes
         
         for c_index in range(len(outputs)):
-            roots = self.division_initialization_nd(outputs[c_index], False)
-            while(roots):
-                root = roots.pop(0)
-                self.prune_all_the_dimensions(outputs[c_index], root, False)
-                connections3 = connections3.union(self.connections)
-                self.connections = set()
+            root = self.division_initialization_nd(outputs[c_index], False)
+            self.prune_all_the_dimensions(outputs[c_index], root, False)
+            connections3 = connections3.union(self.connections)
+            self.connections = set()
         connections = connections1.union(connections2.union(connections3))
         return self.clean_n_dimensional(connections)
             
