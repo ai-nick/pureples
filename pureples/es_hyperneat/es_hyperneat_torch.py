@@ -454,6 +454,7 @@ class nDimensionGoldenTree:
         self.width = width
         self.full_width = width * 2
         self.sub_width = self.full_width / 1.61805
+        self.offset_dist = self.sub_width - self.width
         self.lvl = level
         self.num_children = 2**len(self.coord)
         self.cs = []
@@ -464,7 +465,7 @@ class nDimensionGoldenTree:
     def set_signs(self):
         return list(itertools.product([1,-1], repeat=len(self.coord)))
 
-    def sub_divide(self):
+    def divide_childrens(self):
         sign = 1
         golden_cube = []
         dimen = len(self.coord)
@@ -476,7 +477,7 @@ class nDimensionGoldenTree:
             new_center = 0.0
             for y in range(dimen):
                 # shift the root inversely from the direction to the center of the sub cube
-                new_center = self.coord[y] + ((self.signs[i][y]*-1)*(self.full_width - self.sub_width))
+                new_center = self.coord[y] + ((self.signs[i][y]*-1)*self.offset_dist)
                 # us new root position in this dimension as spot to offset from
                 child_root.append(new_center + (self.sub_width/(2*self.signs[i][y])))
             self.cs.append(nDimensionGoldenTree(child_root, self.sub_width/2, self.lvl+1))
