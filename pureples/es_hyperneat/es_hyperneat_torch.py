@@ -164,7 +164,7 @@ class ESNetwork:
         for s in range(dimen):
             root_coord.append(0.0)
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
-        root = nDimensionTree(root_coord, 1.0, 1)
+        root = nDimensionGoldenTree(root_coord, 2.0, 1)
         q = [root]
         new_roots = []
         while q:
