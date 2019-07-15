@@ -450,7 +450,7 @@ class nDimensionGoldenTree:
 
     def __init__(self, in_coord, width, level):
         self.w = 0.0
-        self.coord = in_coord
+        self.coord = in_coord5
         self.width = width
         self.full_width = width * 2
         self.sub_width = self.full_width / 1.61805
