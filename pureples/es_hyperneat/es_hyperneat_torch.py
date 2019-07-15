@@ -175,12 +175,7 @@ class ESNetwork:
             for c in p.cs:
                 c.w = query_torch_cppn(coord, c.coord, outgoing, self.cppn, self.max_weight)
             
-<<<<<<< HEAD
-            if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and abs(self.variance(p)) > self.division_threshold):
-                new_roots.append(p)
-=======
             if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p) > self.division_threshold):
->>>>>>> d3427d8c601e20783612620e104f22ced4204a21
                 for child in p.cs:
                     q.append(child)
 
