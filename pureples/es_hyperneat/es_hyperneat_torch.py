@@ -27,9 +27,36 @@ class ESNetwork:
         self.width = len(substrate.output_coordinates)
         self.root_x = self.width/2
         self.root_y = (len(substrate.input_coordinates)/self.width)/2
+<<<<<<< HEAD
         #self.init_tree = tree_in
 
 
+=======
+
+    def subdivide_initial(self, tree, num_sub_trees, tree_num):
+        for x in range(tree.num_children):
+            new_coord = []
+            for y in range(len(tree.coord)):
+                new_coord.append(tree.coord[y] + (tree.width/(2*tree.signs[x][y])))
+            newby = nDimensionTree(new_coord, tree.width/2, tree.lvl+1)
+            tree.cs.append(newby)
+            if(num_sub_trees+1 == num_sub_trees):
+                return
+            self.subdivide_initial(newby, num_sub_trees, num_sub_trees+1)
+        
+        #finds num of hypercubes of m dimensions on the boundary of a n dimensional hypercube
+    def find_sub_hypercubes(self, n, m):
+        #we will assume its been scaled into a unit hypercube
+        if(m == n):
+            return 1 #someone trying to find number of thing inside thing, that just one thing sir
+        diff = n - m
+        diff_factorial = factorial(diff)
+        search_factorial = factorial(n)
+        sub_factorial = factorial(m)
+        num_subs = (2**diff)*(search_factorial/(diff_factorial*sub_factorial))
+        return num_subs
+    
+>>>>>>> a7cd270... going to subdivide to min depth just once
     # creates phenotype with n dimensions
     def create_phenotype_network_nd(self, init_depth_tree, filename=None):
         input_coordinates = self.substrate.input_coordinates
