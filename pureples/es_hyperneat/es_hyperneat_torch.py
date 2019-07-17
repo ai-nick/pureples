@@ -8,6 +8,8 @@ from math import factorial
 
 class ESNetwork:
 
+    first_subdivide = False
+
     def __init__(self, substrate, cppn, params):
         self.substrate = substrate
         self.cppn = cppn
@@ -26,7 +28,6 @@ class ESNetwork:
         self.root_x = self.width/2
         self.root_y = (len(substrate.input_coordinates)/self.width)/2
 
-<<<<<<< HEAD
     def subdivide_initial(self, tree, num_sub_trees, tree_num):
         for x in range(tree.num_children):
             new_coord = []
@@ -38,8 +39,6 @@ class ESNetwork:
                 return
             self.subdivide_initial(newby, num_sub_trees, num_sub_trees+1)
         
-=======
->>>>>>> 17063e82ab556d7c5464ffd7e4f79eefbcfe5c02
         #finds num of hypercubes of m dimensions on the boundary of a n dimensional hypercube
     def find_sub_hypercubes(self, n, m):
         #we will assume its been scaled into a unit hypercube
@@ -179,6 +178,8 @@ class ESNetwork:
             root_coord.append(0.0)
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
         root = nDimensionTree(root_coord, 1.0, 1)
+        if (self.first_subdivide == true):
+            self.subdivide_initial(root, root.num_children**self.initial_depth, 0)
         q = [root]
         new_roots = []
         while q:
