@@ -74,7 +74,7 @@ def find_neurons(cppn, coord, nodes, start_idx, outgoing, max_weight=5.0):
     return im
 
 
-def query_cppn_nd(coord1, coord2, outgoing, cppn, max_weight=5.0):
+def query_torch_cppn(coord1, coord2, outgoing, cppn, max_weight=5.0):
     result = 0.0
     num_dimen = len(coord1)
     master = {}

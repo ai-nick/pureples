@@ -8,7 +8,7 @@ from math import factorial
 
 class ESNetwork:
 
-    first_subdivide = False
+    first_subdivide = True
 
     def __init__(self, substrate, cppn, params):
         self.substrate = substrate
@@ -27,8 +27,9 @@ class ESNetwork:
         self.width = len(substrate.output_coordinates)
         self.root_x = self.width/2
         self.root_y = (len(substrate.input_coordinates)/self.width)/2
-
-    def subdivide_initial(self, tree, num_sub_trees, tree_num):
+    
+    @staticmethod
+    def subdivide_initial(tree, num_sub_trees, tree_num):
         for x in range(tree.num_children):
             new_coord = []
             for y in range(len(tree.coord)):
@@ -37,7 +38,7 @@ class ESNetwork:
             tree.cs.append(newby)
             if(num_sub_trees+1 == num_sub_trees):
                 return
-            self.subdivide_initial(newby, num_sub_trees, num_sub_trees+1)
+            ESNetwork.subdivide_initial(newby, num_sub_trees, num_sub_trees+1)
         
         #finds num of hypercubes of m dimensions on the boundary of a n dimensional hypercube
     def find_sub_hypercubes(self, n, m):
@@ -52,7 +53,7 @@ class ESNetwork:
         return num_subs
 
     # creates phenotype with n dimensions
-    def create_phenotype_network_nd(self, filename=None):
+    def create_phenotype_network_nd(self, init_depth_tree, filename=None):
         input_coordinates = self.substrate.input_coordinates
         output_coordinates = self.substrate.output_coordinates
 
@@ -72,7 +73,7 @@ class ESNetwork:
         coords_to_id = dict(zip(coordinates, indices))
 
         # Where the magic happens.
-        hidden_nodes, connections = self.es_hyperneat_nd()
+        hidden_nodes, connections = self.es_hyperneat_nd(init_depth_tree)
 
         for cs in hidden_nodes:
             coords_to_id[cs] = hidden_idx
@@ -168,7 +169,7 @@ class ESNetwork:
         return np.var(self.get_weights(p))
 
 
-    def division_initialization_nd(self, coord, outgoing):
+    def division_initialization_nd(self, coord, outgoing, initial_tree):
         dimen = len(coord)
         root_coord = []
         #we will loop twice the length of the substrate coord
@@ -178,8 +179,10 @@ class ESNetwork:
             root_coord.append(0.0)
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
         root = nDimensionTree(root_coord, 1.0, 1)
-        if (self.first_subdivide == true):
+        '''
+        if (self.first_subdivide == True):
             self.subdivide_initial(root, root.num_children**self.initial_depth, 0)
+        '''
         q = [root]
         new_roots = []
         while q:
@@ -281,14 +284,14 @@ class ESNetwork:
                         self.connections.add(con)
 
     # Explores the hidden nodes and their connections.
-    def es_hyperneat_nd(self):
+    def es_hyperneat_nd(self, init_tree):
         inputs = self.substrate.input_coordinates
         outputs = self.substrate.output_coordinates
         hidden_nodes, unexplored_hidden_nodes = set(), set()
         connections1, connections2, connections3 = set(), set(), set()
 
         for i in inputs:
-            roots = self.division_initialization_nd(i, True)
+            roots = self.division_initialization_nd(i, True, init_tree)
             while(roots):
                 root = roots.pop(0)
                 self.prune_all_the_dimensions(i, root, True)
@@ -467,6 +470,16 @@ class nDimensionTree:
                 new_coord.append(self.coord[y] + (self.width/(2*self.signs[x][y])))
             newby = nDimensionTree(new_coord, self.width/2, self.lvl+1)
             self.cs.append(newby)
+
+    @staticmethod
+    def divide_to_depth(tree, current_level, desired_depth):
+        if current_level == desired_depth:
+            return
+        else:
+            tree.divide_childrens()
+            current_level += 1
+            for i in tree.cs:
+                divide_to_depth(i, current_level, desired_depth)
 
 # new tree's corresponding connection structure
 class nd_Connection:
