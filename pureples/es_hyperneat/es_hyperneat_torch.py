@@ -479,7 +479,7 @@ class nDimensionTree:
             tree.divide_childrens()
             current_level += 1
             for i in tree.cs:
-                divide_to_depth(i, current_level, desired_depth)
+                nDimensionTree.divide_to_depth(i, current_level, desired_depth)
 
 # new tree's corresponding connection structure
 class nd_Connection:
