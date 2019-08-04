@@ -10,7 +10,7 @@ class ESNetwork:
 
     first_subdivide = True
 
-    def __init__(self, substrate, cppn, params, tree_in):
+    def __init__(self, substrate, cppn, params):
         self.substrate = substrate
         self.cppn = cppn
         self.initial_depth = params["initial_depth"]
@@ -27,19 +27,8 @@ class ESNetwork:
         self.width = len(substrate.output_coordinates)
         self.root_x = self.width/2
         self.root_y = (len(substrate.input_coordinates)/self.width)/2
-        self.init_tree = tree_in
-        
-        #finds num of hypercubes of m dimensions on the boundary of a n dimensional hypercube
-    def find_sub_hypercubes(self, n, m):
-        #we will assume its been scaled into a unit hypercube
-        if(m == n):
-            return 1 #someone trying to find number of thing inside thing, that just one thing sir
-        diff = n - m
-        diff_factorial = factorial(diff)
-        search_factorial = factorial(n)
-        sub_factorial = factorial(m)
-        num_subs = (2**diff)*(search_factorial/(diff_factorial*sub_factorial))
-        return num_subs
+        #self.init_tree = tree_in
+
 
     # creates phenotype with n dimensions
     def create_phenotype_network_nd(self, init_depth_tree, filename=None):
@@ -164,15 +153,11 @@ class ESNetwork:
         #we will loop twice the length of the substrate coord
         #we set the root of our tree to  zero index coord in the dimension of the input coord
         #we need a n-tree with n being 2^coordlength so that we can split each dimension in a cartesian manner
-        for s in range(dimen):
-            root_coord.append(0.0)
-        #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
-        root = nDimensionTree(root_coord, 1.0, 1)
         '''
         if (self.first_subdivide == True):
             self.subdivide_initial(root, root.num_children**self.initial_depth, 0)
         '''
-        q = [root]
+        q = [initial_tree]
         new_roots = []
         while q:
             p = q.pop(0)
@@ -294,7 +279,7 @@ class ESNetwork:
 
         for i in range(self.iteration_level):
             for index_coord in unexplored_hidden_nodes:
-                roots = self.division_initialization_nd(index_coord, True)
+                roots = self.division_initialization_nd(index_coord, True, initial_tree)
                 while(roots):
                     root = roots.pop(0)
                     self.prune_all_the_dimensions(index_coord, root, True)
@@ -306,7 +291,7 @@ class ESNetwork:
         unexplored_hidden_nodes -= hidden_nodes
 
         for c_index in range(len(outputs)):
-            roots = self.division_initialization_nd(outputs[c_index], False)
+            roots = self.division_initialization_nd(outputs[c_index], False, initial_tree)
             while(roots):
                 root = roots.pop(0)
                 self.prune_all_the_dimensions(outputs[c_index], root, False)
@@ -439,7 +424,7 @@ class QuadPoint:
         self.lvl = lvl
 
 #
-class nDimensionTree:
+class nDimensionTree(object):
 
     def __init__(self, in_coord, width, level):
         self.w = 0.0
