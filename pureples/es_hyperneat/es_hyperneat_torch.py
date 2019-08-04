@@ -178,7 +178,8 @@ class ESNetwork:
             p = q.pop(0)
             # here we will subdivide to 2^coordlength as described above
             # this allows us to search from +- midpoints on each axis of the input coord
-            p.divide_childrens()
+            if(p.lvl <= self.initial_depth):
+                p.divide_childrens()
             for c in p.cs:
                 c.w = query_torch_cppn(coord, c.coord, outgoing, self.cppn, self.max_weight)
 
