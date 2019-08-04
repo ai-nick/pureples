@@ -156,16 +156,18 @@ class ESNetwork:
         return np.var(self.get_weights(p))
 
 
-    def division_initialization_nd(self, coord, outgoing):
+    def division_initialization_nd(self, coord, outgoing, init_tree):
         dimen = len(coord)
         root_coord = []
         #we will loop twice the length of the substrate coord
         #we set the root of our tree to  zero index coord in the dimension of the input coord
         #we need a n-tree with n being 2^coordlength so that we can split each dimension in a cartesian manner
+        '''
         for s in range(dimen):
             root_coord.append(0.0)
+        '''
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
-        root = nDimensionTree(root_coord, 1.0, 1)
+        root = init_tree
         q = [root]
         while q:
             p = q.pop(0)
@@ -446,6 +448,15 @@ class nDimensionTree:
                 new_coord.append(self.coord[y] + (self.width/(2*self.signs[x][y])))
             newby = nDimensionTree(new_coord, self.width/2, self.lvl+1)
             self.cs.append(newby)
+    @staticmethod
+    def divide_to_depth(tree, current_level, desired_depth):
+        if current_level == desired_depth:
+            return
+        else:
+            tree.divide_childrens()
+            current_level += 1
+            for i in tree.cs:
+                nDimensionTree.divide_to_depth(i, current_level, desired_depth)
 
 class nDimensionGoldenTree:
 
