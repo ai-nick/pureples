@@ -82,7 +82,7 @@ class ESNetwork:
         if filename is not None:
             draw_es_nd(coords_to_id, draw_connections, filename)
         print(len(node_evals))
-        return neat.nn.RecurrentNetwork(input_nodes, output_nodes, node_evals)
+        return neat.nn.FeedForwardNetwork(input_nodes, output_nodes, node_evals)
         
     # Create a RecurrentNetwork using the ES-HyperNEAT approach.
     def create_phenotype_network(self, filename=None):
