@@ -163,7 +163,7 @@ class ESNetwork:
             p = q.pop(0)
             # here we will subdivide to 2^coordlength as described above
             # this allows us to search from +- midpoints on each axis of the input coord
-            if(p.lvl <= self.initial_depth):
+            if(p.lvl >= self.initial_depth):
                 p.divide_childrens()
             for c in p.cs:
                 c.w = query_torch_cppn(coord, c.coord, outgoing, self.cppn, self.max_weight)
@@ -279,7 +279,7 @@ class ESNetwork:
 
         for i in range(self.iteration_level):
             for index_coord in unexplored_hidden_nodes:
-                roots = self.division_initialization_nd(index_coord, True, initial_tree)
+                roots = self.division_initialization_nd(index_coord, True, init_tree)
                 while(roots):
                     root = roots.pop(0)
                     self.prune_all_the_dimensions(index_coord, root, True)
@@ -291,7 +291,7 @@ class ESNetwork:
         unexplored_hidden_nodes -= hidden_nodes
 
         for c_index in range(len(outputs)):
-            roots = self.division_initialization_nd(outputs[c_index], False, initial_tree)
+            roots = self.division_initialization_nd(outputs[c_index], False, init_tree)
             while(roots):
                 root = roots.pop(0)
                 self.prune_all_the_dimensions(outputs[c_index], root, False)
