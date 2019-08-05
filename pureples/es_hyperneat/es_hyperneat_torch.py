@@ -174,6 +174,7 @@ class ESNetwork:
             # here we will subdivide to 2^coordlength as described above
             # this allows us to search from +- midpoints on each axis of the input coord
             if p.lvl >= self.initial_depth:
+                print("subdividing for depth: ", p.lvl)
                 p.divide_childrens()
             for c in p.cs:
                 c.w = query_torch_cppn(coord, c.coord, outgoing, self.cppn, self.max_weight)
