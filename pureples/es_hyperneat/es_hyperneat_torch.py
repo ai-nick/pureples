@@ -27,11 +27,6 @@ class ESNetwork:
         self.width = len(substrate.output_coordinates)
         self.root_x = self.width/2
         self.root_y = (len(substrate.input_coordinates)/self.width)/2
-<<<<<<< HEAD
-        #self.init_tree = tree_in
-
-
-=======
 
     def subdivide_initial(self, tree, num_sub_trees, tree_num):
         for x in range(tree.num_children):
@@ -56,7 +51,6 @@ class ESNetwork:
         num_subs = (2**diff)*(search_factorial/(diff_factorial*sub_factorial))
         return num_subs
     
->>>>>>> a7cd270... going to subdivide to min depth just once
     # creates phenotype with n dimensions
     def create_phenotype_network_nd(self, init_depth_tree, filename=None):
         input_coordinates = self.substrate.input_coordinates
