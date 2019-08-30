@@ -444,6 +444,16 @@ class nDimensionTree:
                 new_coord.append(self.coord[y] + (self.width/(2*self.signs[x][y])))
             newby = nDimensionTree(new_coord, self.width/2, self.lvl+1)
             self.cs.append(newby)
+
+    @staticmethod
+    def divide_to_depth(tree, current_level, desired_depth):
+        if current_level == desired_depth:
+            return
+        else:
+            tree.divide_childrens()
+            current_level += 1
+            for i in tree.cs:
+                nDimensionTree.divide_to_depth(i, current_level, desired_depth)
     
 # new tree's corresponding connection structure
 class nd_Connection:
