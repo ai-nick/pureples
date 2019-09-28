@@ -8,6 +8,8 @@ from math import factorial
 
 class ESNetwork:
 
+    first_subdivide = True
+
     def __init__(self, substrate, cppn, params):
         self.substrate = substrate
         self.cppn = cppn
@@ -26,6 +28,20 @@ class ESNetwork:
         self.root_x = self.width/2
         self.root_y = (len(substrate.input_coordinates)/self.width)/2
 
+<<<<<<< HEAD
+=======
+    def subdivide_initial(self, tree, num_sub_trees, tree_num):
+        for x in range(tree.num_children):
+            new_coord = []
+            for y in range(len(tree.coord)):
+                new_coord.append(tree.coord[y] + (tree.width/(2*tree.signs[x][y])))
+            newby = nDimensionTree(new_coord, tree.width/2, tree.lvl+1)
+            tree.cs.append(newby)
+            if(num_sub_trees+1 == num_sub_trees):
+                return
+            self.subdivide_initial(newby, num_sub_trees, num_sub_trees+1)
+        
+>>>>>>> 50d323d5d017d1729a18dd67ccacf6610c8832c5
         #finds num of hypercubes of m dimensions on the boundary of a n dimensional hypercube
     def find_sub_hypercubes(self, n, m):
         #we will assume its been scaled into a unit hypercube
@@ -39,7 +55,7 @@ class ESNetwork:
         return num_subs
 
     # creates phenotype with n dimensions
-    def create_phenotype_network_nd(self, filename=None):
+    def create_phenotype_network_nd(self, init_depth_tree, filename=None):
         input_coordinates = self.substrate.input_coordinates
         output_coordinates = self.substrate.output_coordinates
 
@@ -59,7 +75,11 @@ class ESNetwork:
         coords_to_id = dict(zip(coordinates, indices))
 
         # Where the magic happens.
+<<<<<<< HEAD
         hidden_nodes, connections = self.es_hyperneat_nd()
+=======
+        hidden_nodes, connections = self.es_hyperneat_nd(init_depth_tree)
+>>>>>>> 50d323d5d017d1729a18dd67ccacf6610c8832c5
 
         for cs in hidden_nodes:
             coords_to_id[cs] = hidden_idx
@@ -155,23 +175,32 @@ class ESNetwork:
         return np.var(self.get_weights(p))
 
 
-    def division_initialization_nd(self, coord, outgoing):
+    def division_initialization_nd(self, coord, outgoing, initial_tree):
         dimen = len(coord)
         root_coord = []
         #we will loop twice the length of the substrate coord
         #we set the root of our tree to  zero index coord in the dimension of the input coord
         #we need a n-tree with n being 2^coordlength so that we can split each dimension in a cartesian manner
+<<<<<<< HEAD
         for s in range(dimen):
             root_coord.append(0.0)
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
         root = nDimensionGoldenTree(root_coord, 2.0, 1)
         q = [root]
+=======
+        '''
+        if (self.first_subdivide == True):
+            self.subdivide_initial(root, root.num_children**self.initial_depth, 0)
+        '''
+        q = [initial_tree]
+>>>>>>> 50d323d5d017d1729a18dd67ccacf6610c8832c5
         new_roots = []
         while q:
             p = q.pop(0)
             # here we will subdivide to 2^coordlength as described above
             # this allows us to search from +- midpoints on each axis of the input coord
-            p.divide_childrens()
+            if(p.lvl >= self.initial_depth):
+                p.divide_childrens()
             for c in p.cs:
                 c.w = query_torch_cppn(coord, c.coord, outgoing, self.cppn, self.max_weight)
 
@@ -266,14 +295,14 @@ class ESNetwork:
                         self.connections.add(con)
 
     # Explores the hidden nodes and their connections.
-    def es_hyperneat_nd(self):
+    def es_hyperneat_nd(self, init_tree):
         inputs = self.substrate.input_coordinates
         outputs = self.substrate.output_coordinates
         hidden_nodes, unexplored_hidden_nodes = set(), set()
         connections1, connections2, connections3 = set(), set(), set()
 
         for i in inputs:
-            roots = self.division_initialization_nd(i, True)
+            roots = self.division_initialization_nd(i, True, init_tree)
             while(roots):
                 root = roots.pop(0)
                 self.prune_all_the_dimensions(i, root, True)
@@ -286,7 +315,7 @@ class ESNetwork:
 
         for i in range(self.iteration_level):
             for index_coord in unexplored_hidden_nodes:
-                roots = self.division_initialization_nd(index_coord, True)
+                roots = self.division_initialization_nd(index_coord, True, init_tree)
                 while(roots):
                     root = roots.pop(0)
                     self.prune_all_the_dimensions(index_coord, root, True)
@@ -298,7 +327,7 @@ class ESNetwork:
         unexplored_hidden_nodes -= hidden_nodes
 
         for c_index in range(len(outputs)):
-            roots = self.division_initialization_nd(outputs[c_index], False)
+            roots = self.division_initialization_nd(outputs[c_index], False, init_tree)
             while(roots):
                 root = roots.pop(0)
                 self.prune_all_the_dimensions(outputs[c_index], root, False)
@@ -472,7 +501,11 @@ class nDimensionGoldenTree:
     def recursive_subdivide(tree, depth):
         return 
 #
+<<<<<<< HEAD
 class nDimensionTree:
+=======
+class nDimensionTree(object):
+>>>>>>> 50d323d5d017d1729a18dd67ccacf6610c8832c5
 
     def __init__(self, in_coord, width, level):
         self.w = 0.0
@@ -493,6 +526,18 @@ class nDimensionTree:
                 new_coord.append(self.coord[y] + (self.width/(2*self.signs[x][y])))
             newby = nDimensionTree(new_coord, self.width/2, self.lvl+1)
             self.cs.append(newby)
+<<<<<<< HEAD
+=======
+    @staticmethod
+    def divide_to_depth(tree, current_level, desired_depth):
+        if current_level == desired_depth:
+            return
+        else:
+            tree.divide_childrens()
+            current_level += 1
+            for i in tree.cs:
+                nDimensionTree.divide_to_depth(i, current_level, desired_depth)
+>>>>>>> 50d323d5d017d1729a18dd67ccacf6610c8832c5
 
 # new tree's corresponding connection structure
 class nd_Connection:

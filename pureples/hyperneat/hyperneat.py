@@ -102,8 +102,8 @@ def query_cppn_nd(coord1, coord2, outgoing, cppn, max_weight=5.0):
             i.append(coord1[ix])
         i.append(1.0)
     w = cppn.activate(i)[0]
-    if abs(w) > .2:
-        return (abs(w) - .2)*max_weight/(.8)*np.sign(w)
+    if abs(w) > .1:
+        return w
     else:
         return 0.0
 
