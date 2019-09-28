@@ -136,12 +136,10 @@ class ESNetwork:
     @staticmethod
     def get_weights(p):
         temp = []
-
         def loop(pp):
-            if pp is not None and all(child is not None for child in pp.cs):
-                if len(pp.cs) > 0:
-                    for i in range(0, pp.num_children):
-                        loop(pp.cs[i])
+            if (pp is not None and len(pp.cs) > 0):
+                for i in range(0, pp.num_children):
+                    loop(pp.cs[i])
             else:
                 if pp is not None:
                     temp.append(pp.w)
@@ -158,13 +156,14 @@ class ESNetwork:
     def division_initialization_nd(self, coord, outgoing):
         dimen = len(coord)
         root_coord = []
+        explored_count = 0
         #we will loop twice the length of the substrate coord
         #we set the root of our tree to  zero index coord in the dimension of the input coord
         #we need a n-tree with n being 2^coordlength so that we can split each dimension in a cartesian manner
         for s in range(dimen):
             root_coord.append(0.0)
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
-        root = nDimensionTree(root_coord, 1.0, 1)
+        root = nDimensionTree(root_coord, 2.0, 1)
         q = [root]
         while q:
             p = q.pop(0)
@@ -173,11 +172,10 @@ class ESNetwork:
             p.divide_childrens()
             for c in p.cs:
                 c.w = query_cppn_nd(coord, p.coord, outgoing, self.cppn, self.max_weight)
-            
             if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p) > self.division_threshold):
                 for child in p.cs:
                     q.append(child)
-
+        #print("queried: ", explored_count)
         return root
 
 
@@ -205,7 +203,7 @@ class ESNetwork:
     def prune_all_the_dimensions(self, coord, p, outgoing):
         for c in p.cs:
             child_array = []
-            if self.variance(c) > self.variance_threshold:
+            if self.variance(c) > self.variance_threshold or c.lvl < self.initial_depth:
                 self.prune_all_the_dimensions(coord, c, outgoing)
             else:
                 c_len = len(child_array)
@@ -244,7 +242,8 @@ class ESNetwork:
         for c in p.cs:
 
             d_left, d_right, d_top, d_bottom = None, None, None, None
-
+            #if the child tree has high enough variance
+            #recurse with this function on the child
             if self.variance(c) > self.variance_threshold:
                 self.pruning_extraction(coord, c, outgoing)
             else:
@@ -252,7 +251,6 @@ class ESNetwork:
                 d_right = abs(c.w - query_cppn(coord, (c.x + p.width, c.y), outgoing, self.cppn, self.max_weight))
                 d_top = abs(c.w - query_cppn(coord, (c.x, c.y - p.width), outgoing, self.cppn, self.max_weight))
                 d_bottom = abs(c.w - query_cppn(coord, (c.x, c.y + p.width), outgoing, self.cppn, self.max_weight))
-
                 con = None
                 if max(min(d_top, d_bottom), min(d_left, d_right)) > self.band_threshold:
                     if outgoing:
