@@ -28,20 +28,6 @@ class ESNetwork:
         self.root_x = self.width/2
         self.root_y = (len(substrate.input_coordinates)/self.width)/2
 
-<<<<<<< HEAD
-=======
-    def subdivide_initial(self, tree, num_sub_trees, tree_num):
-        for x in range(tree.num_children):
-            new_coord = []
-            for y in range(len(tree.coord)):
-                new_coord.append(tree.coord[y] + (tree.width/(2*tree.signs[x][y])))
-            newby = nDimensionTree(new_coord, tree.width/2, tree.lvl+1)
-            tree.cs.append(newby)
-            if(num_sub_trees+1 == num_sub_trees):
-                return
-            self.subdivide_initial(newby, num_sub_trees, num_sub_trees+1)
-        
->>>>>>> 50d323d5d017d1729a18dd67ccacf6610c8832c5
         #finds num of hypercubes of m dimensions on the boundary of a n dimensional hypercube
     def find_sub_hypercubes(self, n, m):
         #we will assume its been scaled into a unit hypercube
