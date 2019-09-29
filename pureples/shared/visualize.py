@@ -149,5 +149,6 @@ def draw_es_nd(id_to_coords, connections, filename):
     fig.savefig(filename)
     plt.show()
     fig.savefig(filename)
+    plt.close()
     
 
