@@ -8,7 +8,7 @@ from math import factorial
 
 class ESNetwork:
 
-    def __init__(self, substrate, cppn, params):
+    def __init__(self, substrate, cppn, params, num_activations):
         self.substrate = substrate
         self.cppn = cppn
         self.initial_depth = params["initial_depth"]
@@ -19,7 +19,7 @@ class ESNetwork:
         self.division_threshold = params["division_threshold"]
         self.max_weight = params["max_weight"]
         self.connections = set()
-        self.activations = 2 ** params["max_depth"] + 1  # Number of layers in the network.
+        self.activations = num_activations  # Number of layers in the network.
         activation_functions = neat.activations.ActivationFunctionSet()
         self.activation = activation_functions.get(params["activation"])
         self.width = len(substrate.output_coordinates)
