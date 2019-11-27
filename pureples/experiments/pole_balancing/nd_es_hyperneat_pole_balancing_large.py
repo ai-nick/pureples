@@ -18,8 +18,8 @@ output_coordinates = [(-1., 1., -1.), (1., 1., -1.)]
 sub = Substrate(input_coordinates, output_coordinates)
 
 # ES-HyperNEAT specific parameters.
-params = {"initial_depth": 2,
-          "max_depth": 3,
+params = {"initial_depth": 1,
+          "max_depth": 2,
           "variance_threshold": 0.03,
           "band_threshold": 0.3,
           "iteration_level": 1,

@@ -8,7 +8,7 @@ from math import factorial
 
 class ESNetwork:
 
-    def __init__(self, substrate, cppn, params, num_activations):
+    def __init__(self, substrate, cppn, params, num_activations = 0):
         self.substrate = substrate
         self.cppn = cppn
         self.initial_depth = params["initial_depth"]
@@ -19,7 +19,7 @@ class ESNetwork:
         self.division_threshold = params["division_threshold"]
         self.max_weight = params["max_weight"]
         self.connections = set()
-        self.activations = num_activations  # Number of layers in the network.
+        self.activations = self.activations = 2 ** params["max_depth"] + 1  # Number of layers in the network.
         activation_functions = neat.activations.ActivationFunctionSet()
         self.activation = activation_functions.get(params["activation"])
         self.width = len(substrate.output_coordinates)
@@ -134,7 +134,7 @@ class ESNetwork:
 
     # Recursively collect all weights for a given QuadPoint.
     @staticmethod
-    def get_weights(p):
+    def get_weights_nd(p):
         temp = []
         def loop(pp):
             if (pp is not None and len(pp.cs) > 0):
@@ -147,11 +147,27 @@ class ESNetwork:
         return temp
 
     # Find the variance of a given QuadPoint.
-    def variance(self, p):
+    def variance(self, p, nd = False):
         if not p:
             return 0.0
-        return np.var(self.get_weights(p))
+        if(nd == False):
+            return np.var(self.get_weights(p))
+        else:
+            return np.var(self.get_weights_nd(p))
 
+    @staticmethod
+    def get_weights(p):
+        temp = []
+
+        def loop(pp):
+            if pp is not None and all(child is not None for child in pp.cs):
+                for i in range(0, 4):
+                    loop(pp.cs[i])
+            else:
+                if pp is not None:
+                    temp.append(pp.w)
+        loop(p)
+        return temp
 
     def division_initialization_nd(self, coord, outgoing):
         dimen = len(coord)
@@ -163,7 +179,7 @@ class ESNetwork:
         for s in range(dimen):
             root_coord.append(0.0)
         #set width and level to 1.0 and 1, assume the substrate been scaled to a unit hypercube
-        root = nDimensionTree(root_coord, 1.0, 1)
+        root = nDimensionTree(root_coord, 1.0, 1.0)
         q = [root]
         while q:
             p = q.pop(0)
@@ -171,17 +187,18 @@ class ESNetwork:
             # this allows us to search from +- midpoints on each axis of the input coord
             p.divide_childrens()
             for c in p.cs:
-                c.w = query_cppn_nd(coord, p.coord, outgoing, self.cppn, self.max_weight)
-            if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p) > self.division_threshold):
+                c.w = query_cppn_nd(coord, c.coord, outgoing, self.cppn, self.max_weight)
+            if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p, True) > self.division_threshold):
+                explored_count += 1
                 for child in p.cs:
                     q.append(child)
-        #print("queried: ", explored_count)
         return root
 
 
     # Initialize the quadtree by dividing it in appropriate quads.
     def division_initialization(self, coord, outgoing):
         root = QuadPoint(0.0, 0.0, 1.0, 1.0)
+        explored = 0
         q = [root]
         while q:
             p = q.pop(0)
@@ -193,17 +210,16 @@ class ESNetwork:
 
             for c in p.cs:
                 c.w = query_cppn(coord, (c.x, c.y), outgoing, self.cppn, self.max_weight)
-            
             if (p.lvl < self.initial_depth) or (p.lvl < self.max_depth and self.variance(p) > self.division_threshold):
+                explored += 1
                 for child in p.cs:
                     q.append(child)
-
         return root
     # n-dimensional pruning and extradition
     def prune_all_the_dimensions(self, coord, p, outgoing):
         for c in p.cs:
             child_array = []
-            if self.variance(c) > self.variance_threshold or c.lvl < self.initial_depth:
+            if self.variance(c, True) > self.variance_threshold or c.lvl < self.initial_depth:
                 self.prune_all_the_dimensions(coord, c, outgoing)
             else:
                 c_len = len(child_array)
@@ -442,6 +458,7 @@ class nDimensionTree:
                 new_coord.append(self.coord[y] + (self.width/(2*self.signs[x][y])))
             newby = nDimensionTree(new_coord, self.width/2, self.lvl+1)
             self.cs.append(newby)
+
 
     @staticmethod
     def divide_to_depth(tree, current_level, desired_depth):
